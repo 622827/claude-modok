@@ -1,0 +1,11 @@
+{
+  "name": "claude-modok",
+  "owner": { "name": "622827" },
+  "plugins": [
+    {
+      "name": "task-progress",
+      "source": "./task-progress",
+      "description": "Állapotsáv minden feladathoz: eltelt idő, becsült hátralévő idő, százalék"
+    }
+  ]
+}
