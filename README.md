@@ -24,3 +24,11 @@ Claude Code-ban:
 ```
 
 A repó privát, ezért a gépeden be kell lenni jelentkezve GitHubra (pl. `gh auth login`).
+
+## manok
+
+Három segéd (Designer, Coder, Auditor) egy panelben: mindegyiknek külön feladatot adhatsz, az eredmények a panelben jelennek meg.
+
+```
+/plugin install manok@claude-modok
+```
