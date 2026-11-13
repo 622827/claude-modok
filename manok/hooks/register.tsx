@@ -115,20 +115,18 @@ function setResult(id: ElfId, r: ElfResult, $: any) {
   return update($, results, all => ({ ...all, [id]: r }))
 }
 
-async function start($: any) {
+async function start($: any, main: string) {
   const p = await read($, picked)
   const t = await read($, tasks)
   const chosen = IDS.filter(id => p[id])
-  if (chosen.length === 0) {
-    $.ui.toast('Jelölj be legalább egy manót!')
-    return
-  }
+  if (chosen.length === 0) return
   for (const id of chosen) await setResult(id, { status: 'idle', text: '' }, $)
   const out: Partial<Record<ElfId, string>> = {}
 
   // Sorrend: Designer -> Coder -> Auditor. Mindegyik megkapja az előző(ek) munkáját.
   for (const id of chosen) {
-    let task = t[id].trim()
+    // Ha a manónak nincs saját feladata, a fő üzeneted a feladata.
+    let task = t[id].trim() || main
     let prompt = task
     if (id === 'iro' && out.kutato) {
       prompt = `${task || 'Valósítsd meg a Designer tervét.'}\n\n--- A Designer terve ---\n${out.kutato}`
@@ -178,6 +176,13 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // A manók mindig együtt indulnak a fő üzeneteddel (a / parancsokat kihagyja).
+  on('prompt.submit', async ($, e, next) => {
+    const text = String((e as any).text ?? '').trim()
+    if (!text.startsWith('/')) void start($, text)
+    return next(e)
+  })
+
   on('command.run', { command: 'manok' }, async $ => {
     const wasHidden = await read($, hidden)
     await update($, hidden, () => !wasHidden)
@@ -209,18 +214,11 @@ export const register: Register = on => {
           : res[id].status === 'error'
             ? 'hiba'
             : ''
-    const n = IDS.filter(id => p[id]).length
     const hasResults = IDS.some(id => res[id].status !== 'idle')
 
     return (
       <Box flexDirection="column" gap={1}>
         <Box gap={2} alignItems="center" flexWrap="wrap">
-          <Button
-            key="start"
-            variant="primary"
-            label={n === 0 ? 'Indítás' : `Indítás · ${n}`}
-            onPress={() => start($)}
-          />
           {hasResults && (
             <Button
               key="clear"
