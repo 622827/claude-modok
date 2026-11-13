@@ -1,1 +1,1 @@
-{ "name": "manok", "version": "0.1.0", "description": "Manók: Designer, Coder és Auditor segédek egy panelben", "types": "./types/index.d.ts" }
+{ "name": "manok", "version": "0.1.19", "description": "Három manó (Designer, Coder, Auditor) panelja: kijelölöd, feladatot írsz, egy gombbal elindítod őket.", "types": "./types/index.d.ts" }
