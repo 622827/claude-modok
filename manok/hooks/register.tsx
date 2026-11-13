@@ -182,9 +182,10 @@ export const register: Register = on => {
   on('command.run', { command: 'manok' }, async $ => {
     const wasHidden = await read($, hidden)
     await update($, hidden, () => !wasHidden)
-    if (wasHidden) await $.ui.open({ id: PANE, title: 'Manók' })
+    let placed: any = ''
+    if (wasHidden) placed = await $.ui.open({ id: PANE, title: 'Manók' })
     else await $.ui.close({ id: PANE })
-    return { text: wasHidden ? 'A manók panel megnyitva.' : 'A manók elrejtve. /manok: újra elő.' }
+    return { text: wasHidden ? `A manók panel megnyitva. (felület rajzolja: ${JSON.stringify(placed)})` : 'A manók elrejtve. /manok: újra elő.' }
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e, next) => {
