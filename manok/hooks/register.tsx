@@ -174,18 +174,21 @@ async function start($: any) {
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'manok', description: 'A manók mutatása / elrejtése a szövegmező felett' })
+    await $.command.register({ name: 'manok', description: 'A manók panel mutatása / elrejtése' })
+    if (!(await read($, hidden))) void $.ui.open({ id: PANE, title: 'Manók' })
     return next(e)
   })
 
   on('command.run', { command: 'manok' }, async $ => {
     const wasHidden = await read($, hidden)
     await update($, hidden, () => !wasHidden)
-    return { text: wasHidden ? 'A manók megjelentek a szövegmező felett.' : 'A manók elrejtve. /manok: újra elő.' }
+    if (wasHidden) await $.ui.open({ id: PANE, title: 'Manók' })
+    else await $.ui.close({ id: PANE })
+    return { text: wasHidden ? 'A manók panel megnyitva.' : 'A manók elrejtve. /manok: újra elő.' }
   })
 
-  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    if (e.props.hasSurvey || (await read($, hidden))) return next(e)
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e, next) => {
+    if (await read($, hidden)) return next(e)
     const { Box, Text, Button, Input, Markdown, Svg } = $.ui.resolve(e) as any
     const p = await read($, picked)
     const t = await read($, tasks)

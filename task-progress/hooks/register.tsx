@@ -83,10 +83,15 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+  on('session.start', async ($, e, next) => {
+    void $.ui.open({ id: 'task-progress', title: 'Feladat állapota' })
+    return next(e)
+  })
+
+  on('ui.render', { component: 'Pane', requestId: 'task-progress' }, async ($, e, next) => {
     const r = await read($, run)
-    if (!r) return next(e)
     const { Box, Text } = $.ui.resolve(e)
+    if (!r) return <Box><Text dimColor>Nincs futó feladat.</Text></Box>
     const { pct, left, elapsed } = live(r)
     return (
       <Box>
